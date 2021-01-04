@@ -1,8 +1,14 @@
 # oorep_importer
 
+## Description
+
 A few Python scripts in order to convert and then import repertory data to OOREP (https://www.oorep.com/).
 
-A prerequisite is that the repertory has been "pre-converted" from the raw sources into the following
+## Prerequisites
+
+A prerequisite of this code is the Python parsita module (https://github.com/drhagen/parsita).
+
+Another prerequisite is that the repertory has been "pre-converted" from the raw sources into the following
 human-readable, pretty much self-explanatory format:
 
 ```
@@ -30,7 +36,11 @@ where the amount of trailing `=`-characters shows the depth of a (sub-) rubric w
 Every rubric occupies a single line in the input file. Chapters (i.e., root rubrics) have only a single trailing
 `=`-character.
 
+# Usage
+
 The workflow of conversion is outlined in `__main__.py` and some further examples given in the accompanying unit
 tests.
+
+# Caveat
 
 There is virtually no error handling in the Python code. That's ok.
