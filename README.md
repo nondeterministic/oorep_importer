@@ -26,10 +26,11 @@ human-readable, pretty much self-explanatory format:
 == Zudecken, Hitze, usw. amel.: Clem. (2) Hep. Nux-v. (3) Rhus-t. Stront-c. (2)
 ```
 
-where the amount of `=` shows the depth of a (sub-) rubric with respect to its parent rubric.
-Every rubric is a single line. Chapters (i.e., root rubrics) have only a single trailing `=`.
+where the amount of trailing `=`-characters shows the depth of a (sub-) rubric with respect to its parent rubric.
+Every rubric occupies a single line in the input file. Chapters (i.e., root rubrics) have only a single trailing
+`=`-character.
 
-The workflow is outlined in `__main__.py` and some further examples given in the accompanying unit
+The workflow of conversion is outlined in `__main__.py` and some further examples given in the accompanying unit
 tests.
 
-There is virtually no error handling in the Python code.
+There is virtually no error handling in the Python code. That's ok.
