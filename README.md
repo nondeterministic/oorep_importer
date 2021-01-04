@@ -1,2 +1,3 @@
 # oorep_importer
-Convert and import repertory data to OOREP
+
+A few Python scripts in order to convert and then import repertory data to OOREP (https://www.oorep.com/)
