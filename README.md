@@ -2,14 +2,14 @@
 
 ## Description
 
-A few Python scripts in order to convert and then import repertory data to OOREP (https://www.oorep.com/).
+A few Python3 scripts in order to convert and then import repertory data to OOREP (https://www.oorep.com/).
 
 ## Prerequisites
 
 A prerequisite of this code is the Python parsita module (https://github.com/drhagen/parsita).
 
 Another prerequisite is that the repertory has been "pre-converted" from the raw sources into the following
-human-readable, pretty much self-explanatory format:
+human-readable, pretty much self-explanatory plain-text format:
 
 ```
 = Schweiss
@@ -32,9 +32,9 @@ human-readable, pretty much self-explanatory format:
 == Zudecken, Hitze, usw. amel.: Clem. (2) Hep. Nux-v. (3) Rhus-t. Stront-c. (2)
 ```
 
-where the amount of trailing `=`-characters shows the depth of a (sub-) rubric with respect to its parent rubric.
-Every rubric occupies a single line in the input file. Chapters (i.e., root rubrics) have only a single trailing
-`=`-character.
+where the number of trailing `=`-characters shows the depth of a (sub-) rubric with respect to its parent rubric.
+Chapters (i.e., root rubrics) have therefore only a single trailing `=`-character. Every rubric occupies exactly a
+single line in the input file.
 
 # Usage
 
