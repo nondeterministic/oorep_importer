@@ -14,8 +14,8 @@ glob_repertoryAbbrev = 'bogsk-de'
 class SimpleParser(unittest.TestCase):
     def test(self):
         print("*** Remedy(ies)Parser: ")
-        print(RemedyParser.remedy.parse('RUTA'))
-        print(RemedyParser.remedy.parse('Ruta'))
+        print(RemedyParser.remedy.parse('RUTA')) # This is 4-valued
+        print(RemedyParser.remedy.parse('Ruta')) # This is 1-valued
         print(RemedyParser.remedy.parse('Ars.'))
         print(RemedyParser.remedy.parse('Ars-alb.'))
         print(RemedyParser.remedy.parse('Ars. (3)'))

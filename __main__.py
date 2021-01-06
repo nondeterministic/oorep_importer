@@ -6,6 +6,7 @@
 import parser
 import converter
 import utility
+import psycopg2
 import os
 
 # ###################################################################
@@ -22,30 +23,41 @@ remedies = converter.getCompleteRemedyTable(allRubricsFromFile, repertoryAbbrev)
 rubrics = converter.getCompleteRubricTable(allRubricsFromFile, repertoryAbbrev)
 rubricremedies = converter.getCompleteRubricRemedyTable(remedies, rubrics, allRubricsFromFile)
 
-# Then insert into DB
-# (we only print the SQL statements; actual insertion is left as an exercise to the reader)
-for r in remedies:
-    print(r.getSqlInsertStatement())
+# Then print & insert into DB
+# (we only print the SQL statements; actual insertion is done by removing comment from
+# cursor.execute and connection.commit statements)
 
+connection = psycopg2.connect(user = "oorep_user",
+                             password = os.environ['OOREP_DBUSER_PASS'],
+                             host = "127.0.0.1",
+                             port = "5432",
+                             database = "oorep")
+cursor = connection.cursor()
+
+# This one needs a live DB cursor, so we can lookup a remedy's longname in the DB, if there is one
+for r in remedies:
+    sqlStmt = r.getSqlInsertStatement(cursor)
+    print(sqlStmt)
+#     cursor.execute(sqlStmt)
+# connection.commit()
+
+# This one needs ALL rubrics, in order to find out, if a rubric is a "mother-rubric"
 for r in rubrics:
-    print(r.getSqlInsertStatement())
+    sqlStmt = r.getSqlInsertStatement(allRubricsFromFile)
+    print(sqlStmt)
+#     cursor.execute(sqlStmt)
+# connection.commit()
 
 for r in rubricremedies:
-    print(r.getSqlInsertStatement())
-
-
-import pathlib
-print(pathlib.Path().absolute())
+    sqlStmt = r.getSqlInsertStatement()
+    print(sqlStmt)
+#     cursor.execute(sqlStmt)
+# connection.commit()
 
 # ###################################################################
 # Showcase a utility function
 
-utility.printUniqueRemedies(allRubricsFromFile,
-                            "oorep_user",
-                            os.environ['OOREP_DBUSER_PASS'],
-                            "127.0.0.1",
-                            5432,
-                            "oorep")
+utility.printUniqueRemedies(allRubricsFromFile, cursor)
 
 # ###################################################################
 # Also see 'test.py' for example usage!

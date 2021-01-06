@@ -4,31 +4,47 @@
 # License: GPL v3.0 (or higher)
 
 import parser
+import psycopg2
 
 # Types ######################################################################
 
 class TableRowRemedy:
-    def __init__(self, abbrev: str, ID: int, nameabbrev: str):
+    def __init__(self, abbrev: str, _id: int, nameabbrev: str):
         self.abbrev = abbrev
-        self.ID = ID
+        self._id = _id
         self.nameabbrev = nameabbrev
-    def getSqlInsertStatement(self):
-        return ("insert into remedy(abbrev, id, nameabbrev) values('" +
-                self.abbrev + "', " + str(self.ID) + ", '" + self.nameabbrev + "');")
+    # This one needs a live DB cursor, so we can lookup a remedy's longname in the DB, if there is one
+    def getSqlInsertStatement(self, cursor: psycopg2._psycopg.cursor):
+        cursor.execute("select namelong from remedy where nameabbrev='" + self.nameabbrev + "';")
+        longNames = list(set(cursor.fetchall()))
+        if len(longNames) == 1:
+            return ("insert into remedy(abbrev, id, nameabbrev, namelong) values('" +
+                    self.abbrev + "', " + str(self._id) + ", '" + self.nameabbrev + "', '" + longNames[0][0] + "');")
+        elif len(longNames) > 1:
+            print("Long remedy names should be unique in the database! Found:")
+            print(longNames)
+            print("for " + self.nameabbrev + ".")
+            exit(1)
+        else:
+            return ("insert into remedy(abbrev, id, nameabbrev, namelong) values('" +
+                    self.abbrev + "', " + str(self._id) + ", '" + self.nameabbrev + "', '');")
 
 class TableRowRubric:
-    def __init__(self, abbrev: str, ID: int, mother: int, chapterid: int, fullpath: str, path: str):
+    def __init__(self, abbrev: str, _id: int, mother: int, chapterid: int, fullpath: str, path: str):
         self.abbrev = abbrev
-        self.ID = ID
+        self._id = _id
         self.mother = mother
         self.chapterid = chapterid
         self.fullpath = fullpath
         self.path = path
-    def getSqlInsertStatement(self):
-        return("insert into rubric(abbrev, id, mother, chapterid, fullpath, path) values('" +
+    # This one needs ALL rubrics, in order to find out, if a rubric is a "mother-rubric"
+    def getSqlInsertStatement(self, rubrics: list[parser.Rubric]):
+        isMother = 't' if len(list(filter((lambda rubric: int(rubric.parentIndex) == int(self._id)), rubrics))) > 0 else 'f'
+        return("insert into rubric(abbrev, id, mother, ismother, chapterid, fullpath, path) values('" +
                self.abbrev + "', " +
-               str(self.ID) + ", " +
-               str(self.mother) + ", " +
+               str(self._id) + ", " +
+               str(self.mother) + ", '" +
+               isMother + "', " +
                str(self.chapterid) + ", '" +
                self.fullpath + "', '" +
                self.path + "');")
@@ -97,12 +113,12 @@ def getCompleteRubricRemedyTable(tableRemedy: list[TableRowRemedy],
 
     for rubric in allParsedRubricsFromFile:
         # TODO: I have no idea, why I need explicit conversion to int here. ID should be int by definition:
-        rubricid = int(list(filter((lambda trub: True if trub.path == rubric.text else False), tableRubric))[0].ID)
+        rubricid = int(list(filter((lambda trub: True if trub.path == rubric.text else False), tableRubric))[0]._id)
         for remedy in rubric.remedies:
             tableRows.append(TableRowRubricRemedy(
                 tableRubric[0].abbrev,
                 rubricid,
-                list(filter((lambda trem: True if trem.nameabbrev == remedy.abbrev else False), tableRemedy))[0].ID,
+                list(filter((lambda trem: True if trem.nameabbrev == remedy.abbrev else False), tableRemedy))[0]._id,
                 remedy.weight,
                 tableRubric[rubricid - 1].chapterid
             ))
