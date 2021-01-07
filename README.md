@@ -36,11 +36,21 @@ where the number of trailing `=`-characters shows the depth of a (sub-) rubric w
 Chapters (i.e., root rubrics) have therefore only a single trailing `=`-character. Every rubric occupies exactly a
 single line in the input file.
 
-# Usage
+## Usage
 
 The workflow of conversion is outlined in `__main__.py` and some further examples given in the accompanying unit
 tests.
 
-# Caveat
+## Caveat
 
 There is virtually no error handling in the Python code. That's ok.
+
+## What next?
+
+Usually, you want to apply those changes to your local dev-db first, and then transfer those changed tables to the
+production environment. For sake of completeness, those commands are summarised in the following:
+- Create local dump: `PGPASSWORD="..." pg_dump -h localhost -U oorep_user oorep -Fc -p 5432 > ~/dump.pg`
+- Upload `dump.pg` to server
+- On production server, drop table `remedy`, for example
+- On production server, then restore table `remedy`: `PGPASSWORD="..." pg_restore -h localhost -U oorep_user -d oorep -t remedy dump.pg`
+- Proceed equally with all other modified tables
