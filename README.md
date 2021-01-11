@@ -43,12 +43,14 @@ tests.
 
 ## Caveat
 
-There is virtually no error handling in the Python code. That's ok.
+There is virtually no error handling in the Python code. That's ok. You're meant to know what you're doing.
+
+---
 
 ## What next?
 
-Usually, you want to apply those changes to your local dev-db first, and then transfer those changed tables to the
-production environment. For sake of completeness, those commands are summarised in the following:
+Usually, you want to apply those additions to your local dev-db first, and then transfer those changed tables to the
+production-db. For sake of completeness, those PostgreSQL-commands are summarised in the following:
 - Create local dump: `PGPASSWORD="..." pg_dump -h localhost -U oorep_user oorep -Fc -p 5432 > ~/dump.pg`
 - Upload `dump.pg` to server
 - On production server, drop table `remedy`, for example
