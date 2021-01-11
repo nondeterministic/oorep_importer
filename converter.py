@@ -111,10 +111,8 @@ def getCompleteRubricRemedyTable(tableRemedy: list[TableRowRemedy],
                                  allParsedRubricsFromFile: list[parser.Rubric]):
     tableRows = []
 
-    for rubric in allParsedRubricsFromFile:
-        # TODO: I have no idea, why I need explicit conversion to int here. ID should be int by definition:
-        rubricid = int(list(filter((lambda trub: True if trub.path == rubric.text else False), tableRubric))[0]._id)
-        for remedy in rubric.remedies:
+    for rubricid in range(0, len(allParsedRubricsFromFile)):
+        for remedy in allParsedRubricsFromFile[rubricid].remedies:
             tableRows.append(TableRowRubricRemedy(
                 tableRubric[0].abbrev,
                 rubricid,

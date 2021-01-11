@@ -34,27 +34,25 @@ class Rubric:
             remedies = ""
             for remedy in self.remedies:
                 remedies += str(remedy) + " "
-            return self.text + ": " + remedies.rstrip()
+            return (self.depth * " ") + self.text + ": " + remedies.rstrip()
         else:
-            return self.text
+            return (self.depth * " ") + self.text
 
     def __repr__(self):
         return str(self)
 
-    @classmethod
-    def getParentIndices(cls, rubric, indices: list[int], allRubrics):
-        if rubric.parentIndex < 0:
-            return indices
-        else:
-            indices.append(rubric.parentIndex - 1)
-            return rubric.getParentIndices(allRubrics[rubric.parentIndex - 1], indices, allRubrics)
-
-    @classmethod
-    def getParentPathFromParentIndices(cls, indices: list[int], allRubrics):
+    def getParentPathFromParentIndices(self, indices: list[int], allRubrics):
         fullPath = []
         for parent in indices:
             fullPath.append(allRubrics[parent].text)
         return fullPath[::-1]
+
+    def getParentIndices(self, rubric, indices: list[int], allRubrics):
+        if rubric.parentIndex < 0:
+            return indices
+        else:
+            indices.append(rubric.parentIndex)
+            return rubric.getParentIndices(allRubrics[rubric.parentIndex], indices, allRubrics)
 
     def getFullPath(self, allRubrics):
         path = self.getParentPathFromParentIndices(self.getParentIndices(self, [], allRubrics), allRubrics)
@@ -81,11 +79,11 @@ class RemediesParser(TextParsers, whitespace=None):
 
 class RubricTextParser(TextParsers, whitespace=None):
     rubricRawString = reg(r'[A-Za-z\-äöüßÄÖÜ0-9 \.,;\(\)]+[A-Za-zäöüßÄÖÜ0-9\(\)\.]')
-    rubricDepth = reg(r'=+') > (lambda x: len(x))
+    rubricDepth = reg(r'=+') > (lambda x: int(len(x)))
     rubricText = rubricDepth & reg(r'[ \t]*') >> rubricRawString
 
 class RubricParser(TextParsers, whitespace=None):
-    emptyRubric = RubricTextParser.rubricText << reg(r'(\.)?[ \t]*$') > (lambda x: Rubric(x[1], x[0], []))
+    emptyRubric = RubricTextParser.rubricText << reg(r'(\.|:)?[ \t]*$') > (lambda x: Rubric(x[1], x[0], []))
     nonEmptyRubric = RubricTextParser.rubricText << ':' & reg(r'[ \t]*') >> RemediesParser.remedies > (lambda x: Rubric(x[0][1], x[0][0], x[1]))
 
     rubric = nonEmptyRubric | emptyRubric
@@ -93,18 +91,15 @@ class RubricParser(TextParsers, whitespace=None):
 # The actual parser to call from the outside #################################
 # Returns a list of type list[Rubric]
 
-def getAllRubricsFromFile(fileName: str):
-    with open(fileName, encoding='utf-8-sig') as f:
-        lines = [line.rstrip() for line in f]
-
-    rubricIndex = 1  # an index that will be incr. and added to every parsed rubric; STARTS NOT AT 0 BUT AT 1!
+def getAllRubricsFromFile(lines: list[str]):
+    rubricIndex = 0  # an index that will be incr. and added to every parsed rubric
     resultRubrics = []  # where the parsed rubrics gonna end up in
+    parents = []
 
     for line in lines:
         if len(line) > 0:
             result = RubricParser.rubric.parse(line)
             if isinstance(result, Failure):
-                errors = errors + 1
                 print(result)
                 exit(1)
             else:
@@ -114,11 +109,11 @@ def getAllRubricsFromFile(fileName: str):
                 # Adjust parents-array to link all rubrics transitively back to the chapter/root rubric node
                 if rubric.depth == 1:
                     parents = [(rubric.depth, rubric.index)]
-                elif rubric.depth == parents[-1][0]:
-                    rubric.parentIndex = parents[-2][1]
-                    del parents[-1]
-                    parents.append((rubric.depth, rubric.index))
                 elif rubric.depth > parents[-1][0]:
+                    rubric.parentIndex = parents[-1][1]
+                    parents.append((rubric.depth, rubric.index))
+                elif rubric.depth == parents[-1][0]:
+                    del parents[-1]
                     rubric.parentIndex = parents[-1][1]
                     parents.append((rubric.depth, rubric.index))
                 elif rubric.depth < parents[-1][0]:

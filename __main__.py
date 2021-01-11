@@ -12,13 +12,22 @@ import os
 # ###################################################################
 # Showcase conversion pipeline from raw repertory to database inserts
 
-filename = 'oorep_importer/SKRep3.txt'
+filenames = ['oorep_importer/SKRep3.txt', 'oorep_importer/SRT2.txt']
 repertoryAbbrev = "bogsk-de"
 
-# First parse
-allRubricsFromFile = parser.getAllRubricsFromFile(filename)
+# First concatenate input files line by line into a single list of strings
+completeInputFiles = []
+for filename in filenames:
+    with open(filename, encoding='utf-8-sig') as f:
+        lines = [line.rstrip() for line in f]
+        completeInputFiles.extend(lines)
 
-# Then convert
+# Then parse this complete input consisting of all files and get list of rubrics
+allRubricsFromFile = []
+for filename in filenames:
+    allRubricsFromFile = parser.getAllRubricsFromFile(completeInputFiles)
+
+# Then convert them...
 remedies = converter.getCompleteRemedyTable(allRubricsFromFile, repertoryAbbrev)
 rubrics = converter.getCompleteRubricTable(allRubricsFromFile, repertoryAbbrev)
 rubricremedies = converter.getCompleteRubricRemedyTable(remedies, rubrics, allRubricsFromFile)
@@ -35,22 +44,22 @@ connection = psycopg2.connect(user = "oorep_user",
 cursor = connection.cursor()
 
 # This one needs a live DB cursor, so we can lookup a remedy's longname in the DB, if there is one
-for r in remedies:
-    sqlStmt = r.getSqlInsertStatement(cursor)
-    print(sqlStmt)
-#     cursor.execute(sqlStmt)
+for i in range(0, len(remedies)):
+     sqlStmt = remedies[i].getSqlInsertStatement(cursor)
+     print(str(i + 1) + ": " + sqlStmt)
+#      cursor.execute(sqlStmt)
 # connection.commit()
 
 # This one needs ALL rubrics, in order to find out, if a rubric is a "mother-rubric"
-for r in rubrics:
-    sqlStmt = r.getSqlInsertStatement(allRubricsFromFile)
-    print(sqlStmt)
+for i in range(0, len(rubrics)):
+    sqlStmt = rubrics[i].getSqlInsertStatement(allRubricsFromFile)
+    print(str(i + 1) + ": " + sqlStmt)
 #     cursor.execute(sqlStmt)
 # connection.commit()
 
-for r in rubricremedies:
-    sqlStmt = r.getSqlInsertStatement()
-    print(sqlStmt)
+for i in range(0, len(rubricremedies)):
+    sqlStmt = rubricremedies[i].getSqlInsertStatement()
+    print(str(i + 1) + ": " + sqlStmt)
 #     cursor.execute(sqlStmt)
 # connection.commit()
 
