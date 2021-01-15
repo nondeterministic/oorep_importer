@@ -25,7 +25,7 @@ for filename in filenames:
 # Then parse this complete input consisting of all files and get list of rubrics
 allRubricsFromFile = []
 for filename in filenames:
-    allRubricsFromFile = parser.getAllRubricsFromFile(completeInputFiles)
+    allRubricsFromFile = parser.getAllRubricsFromFileContents(completeInputFiles)
 
 # Then convert them...
 remedies = converter.getCompleteRemedyTable(allRubricsFromFile, repertoryAbbrev)

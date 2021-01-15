@@ -91,7 +91,7 @@ class RubricParser(TextParsers, whitespace=None):
 # The actual parser to call from the outside #################################
 # Returns a list of type list[Rubric]
 
-def getAllRubricsFromFile(lines: list[str]):
+def getAllRubricsFromFileContents(lines: list[str]):
     rubricIndex = 0  # an index that will be incr. and added to every parsed rubric
     resultRubrics = []  # where the parsed rubrics gonna end up in
     parents = []

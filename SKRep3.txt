@@ -15,4 +15,6 @@
 === unterdrückt: Acon. Bell. Bry. Cham. (2) Chin. (2) Coloc. Dulc. Lach. (2) Rhus-t. (2) Sil. Sulph. (2)
 == Entblößen, Abneigung gegen: Clem. Graph. Hep. Nat-c. Nux-v. Rhus-t. Samb. (2) Stront-c.
 == erleichtert nicht: Bell. (2) Dig. Form. Merc. (3) Op.
-== Zudecken, Hitze, usw. amel.: Clem. (2) Hep. Nux-v. (3) Rhus-t. Stront-c. (2)
+=== montags: Clem. (2) Hep. Nux-v. (3) Rhus-t. Stront-c. (2)
+= Modalitäten.
+== Wetter, agg.: BELL., Caust.

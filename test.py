@@ -8,8 +8,14 @@ from parser import *
 import converter
 import unittest
 
-glob_filename = 'SKRep3.txt'
+glob_filenames = ['SKRep3.txt']
 glob_repertoryAbbrev = 'bogsk-de'
+
+completeInputFiles = []
+for filename in glob_filenames:
+    with open(filename, encoding='utf-8-sig') as f:
+        lines = [line.rstrip() for line in f]
+        completeInputFiles.extend(lines)
 
 class SimpleParser(unittest.TestCase):
     def test(self):
@@ -41,7 +47,7 @@ class CompleteParser(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.tmpAllRubrics = parser.getAllRubricsFromFile(glob_filename)
+        cls.tmpAllRubrics = parser.getAllRubricsFromFileContents(completeInputFiles)
 
     def test_outputOfParsedFile(self):
         for rubric in self.tmpAllRubrics:
@@ -56,12 +62,11 @@ class CompleteParser(unittest.TestCase):
 
 class ConvertersRemedy(unittest.TestCase):
     repertoryAbbrev = glob_repertoryAbbrev
-    filename = glob_filename
     allRubricsFromFile = []
 
     @classmethod
     def setUpClass(cls):
-        cls.allRubricsFromFile = parser.getAllRubricsFromFile(cls.filename)
+        cls.allRubricsFromFile = parser.getAllRubricsFromFileContents(completeInputFiles)
 
     def test_getTable(self):
         tableRemedy = converter.getCompleteRemedyTable(self.__class__.allRubricsFromFile, self.__class__.repertoryAbbrev)
@@ -69,13 +74,12 @@ class ConvertersRemedy(unittest.TestCase):
 
 class ConvertersRubric(unittest.TestCase):
     repertoryAbbrev = glob_repertoryAbbrev
-    filename = glob_filename
     allRubricsFromFile = []
     tableRemedy: list[converter.TableRowRemedy] = []
 
     @classmethod
     def setUpClass(cls):
-        cls.allRubricsFromFile = parser.getAllRubricsFromFile(cls.filename)
+        cls.allRubricsFromFile = parser.getAllRubricsFromFileContents(completeInputFiles)
         cls.tableRemedy = converter.getCompleteRemedyTable(cls.allRubricsFromFile, cls.repertoryAbbrev)
 
     def test_getTable(self):
@@ -84,14 +88,13 @@ class ConvertersRubric(unittest.TestCase):
 
 class ConvertersRubricRemedy(unittest.TestCase):
     repertoryAbbrev = glob_repertoryAbbrev
-    filename = glob_filename
     allRubricsFromFile = []
     tableRemedy: list[converter.TableRowRemedy] = []
     tableRubric: list[converter.TableRowRubric] = []
 
     @classmethod
     def setUpClass(cls):
-        cls.allRubricsFromFile = parser.getAllRubricsFromFile(cls.filename)
+        cls.allRubricsFromFile = parser.getAllRubricsFromFileContents(completeInputFiles)
         cls.tableRemedy = converter.getCompleteRemedyTable(cls.allRubricsFromFile, cls.repertoryAbbrev)
         cls.tableRubric = converter.getCompleteRubricTable(cls.allRubricsFromFile, cls.repertoryAbbrev)
 
@@ -101,14 +104,13 @@ class ConvertersRubricRemedy(unittest.TestCase):
 
 class Consistency(unittest.TestCase):
     repertoryAbbrev = glob_repertoryAbbrev
-    filename = glob_filename
     allRubricsFromFile = []
     tableRemedy: list[converter.TableRowRemedy] = []
     tableRubric: list[converter.TableRowRubric] = []
 
     @classmethod
     def setUpClass(cls):
-        cls.allRubricsFromFile = parser.getAllRubricsFromFile(cls.filename)
+        cls.allRubricsFromFile = parser.getAllRubricsFromFileContents(completeInputFiles)
         cls.tableRemedy = converter.getCompleteRemedyTable(cls.allRubricsFromFile, cls.repertoryAbbrev)
         cls.tableRubric = converter.getCompleteRubricTable(cls.allRubricsFromFile, cls.repertoryAbbrev)
 
