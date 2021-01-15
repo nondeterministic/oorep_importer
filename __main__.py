@@ -12,7 +12,7 @@ import os
 # ###################################################################
 # Showcase conversion pipeline from raw repertory to database inserts
 
-filenames = ['oorep_importer/SKRep3.txt', 'oorep_importer/SRT2.txt']
+filenames = ['oorep_importer/SKRep4.txt', 'oorep_importer/SRT3.txt']
 repertoryAbbrev = "bogsk-de"
 
 # First concatenate input files line by line into a single list of strings

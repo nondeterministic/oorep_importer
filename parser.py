@@ -62,8 +62,8 @@ class Rubric:
 # Parsers ####################################################################
 
 class RemedyLexer(TextParsers, whitespace=None):
-    abbrev = reg(r'[A-Z][a-z]+(-?[a-z]+)*\.?')
-    abbrevFourValued = reg(r'[A-Z][A-Z]+(-?[A-Z]+)*\.?')
+    abbrev = reg(r'[A-Z](-?[a-z]+)+\.?')
+    abbrevFourValued = reg(r'[A-Z](-?[A-Z]+)+\.?')
     weight = reg(r'[0-9]+') > int
     weightBrackets = '(' >> weight << ')'
 
@@ -109,7 +109,8 @@ def getAllRubricsFromFile(lines: list[str]):
                 # Adjust parents-array to link all rubrics transitively back to the chapter/root rubric node
                 if rubric.depth == 1:
                     parents = [(rubric.depth, rubric.index)]
-                elif rubric.depth > parents[-1][0]:
+                # Subrubrics must only be at most one level deeper than parent.
+                elif rubric.depth == parents[-1][0] + 1:
                     rubric.parentIndex = parents[-1][1]
                     parents.append((rubric.depth, rubric.index))
                 elif rubric.depth == parents[-1][0]:
@@ -117,10 +118,14 @@ def getAllRubricsFromFile(lines: list[str]):
                     rubric.parentIndex = parents[-1][1]
                     parents.append((rubric.depth, rubric.index))
                 elif rubric.depth < parents[-1][0]:
-                    del parents[-1]
-                    del parents[-1]
+                    depthDifference = parents[-1][0] - rubric.depth + 1
+                    for i in range(depthDifference):
+                        del parents[-1]
                     rubric.parentIndex = parents[-1][1]
                     parents.append((rubric.depth, rubric.index))
+                else:
+                    print("ERROR: Subrubrics must only be at most one level deeper than parent. Check out line: " + rubric.text)
+                    exit(1)
 
                 resultRubrics.append(rubric)
                 rubricIndex += 1
